@@ -1,11 +1,10 @@
 package me.jraynor.client.render.systems
 
-import com.artemis.Aspect
 import com.artemis.BaseSystem
 import com.artemis.ComponentMapper
 import com.artemis.Entity
 import com.artemis.managers.TagManager
-import me.jraynor.client.opengl.FirstPersonCamera
+import me.jraynor.client.opengl.camera.FirstPersonCamera
 import me.jraynor.client.opengl.light.Light
 import me.jraynor.client.opengl.model.Model
 import me.jraynor.client.render.RenderMaster
@@ -45,7 +44,7 @@ abstract class AbstractRenderer() : BaseSystem() {
         val width = gameLayer.fbo.width
         val height = gameLayer.fbo.height
         val viewMatrix = playerCamera.model(playerTransform)
-        val projectMatrix = playerCamera.projection((width / height).toFloat())
+        val projectMatrix = playerCamera.projection()
         renderable(projectMatrix, viewMatrix, playerTransform.position!!)
     }
 

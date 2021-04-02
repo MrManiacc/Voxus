@@ -3,6 +3,7 @@ package me.jraynor.common
 import com.artemis.Component
 import me.jraynor.client.render.util.EditorComponent
 import me.jraynor.common.util.degrees
+import me.jraynor.common.util.radians
 import org.joml.Matrix4f
 import org.joml.Vector3f
 
@@ -82,9 +83,9 @@ data class Transform(
         if (!recompute) return matrix!!
         return matrix!!.identity()
             .translate(position)
-            .rotateX(rotation!!.x.degrees)
-            .rotateY(rotation.y.degrees)
-            .rotateZ(rotation.z.degrees)
+            .rotateX(rotation!!.x.radians)
+            .rotateY(rotation.y.radians)
+            .rotateZ(rotation.z.radians)
             .scale(scale)
     }
 }

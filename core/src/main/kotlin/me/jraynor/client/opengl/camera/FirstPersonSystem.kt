@@ -6,13 +6,10 @@ import com.artemis.Entity
 import com.artemis.managers.TagManager
 import com.artemis.systems.EntityProcessingSystem
 import me.jraynor.client.input.Input
-import me.jraynor.client.opengl.CameraSettings
-import me.jraynor.client.opengl.FirstPersonCamera
 import me.jraynor.common.Transform
 import me.jraynor.common.util.degrees
 import org.joml.Vector3f
 import org.lwjgl.opengl.GL11
-import java.text.DecimalFormat
 import kotlin.math.cos
 import kotlin.math.sin
 

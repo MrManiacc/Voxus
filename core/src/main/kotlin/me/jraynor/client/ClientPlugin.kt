@@ -10,7 +10,7 @@ import me.jraynor.client.window.WindowSystem
 import me.jraynor.client.render.game.GridRenderer
 import me.jraynor.client.render.editor.EditorLayer
 import me.jraynor.client.render.game.GameLayer
-import me.jraynor.client.render.game.LightingTestRenderer
+import me.jraynor.client.render.game.TestRenderEnvironment
 
 /***
  * This class will keep track of the rendering of the world. It's only for the client so it will only be registered if
@@ -27,7 +27,7 @@ class ClientPlugin(private val voxus: Voxus) : ArtemisPlugin {
             WindowSystem(voxus = voxus)
         )
         builder.with(GameLayer())
-        builder.with(LightingTestRenderer())
+        builder.with(TestRenderEnvironment())
         builder.with(EditorLayer())
         builder.with(GridRenderer())
         builder.with(FirstPersonSystem())

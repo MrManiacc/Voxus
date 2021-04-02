@@ -9,6 +9,7 @@ dependencies {
     compile "net.mostlyoriginal.artemis-odb:contrib-core:2.4.0"
     compile "net.mostlyoriginal.artemis-odb:contrib-eventbus:2.4.0"
     compile "net.mostlyoriginal.artemis-odb:contrib-network:2.4.0"
+    compile "me.lignum:JVox:1.0"
     /**Misc**/
     compile group: 'commons-io', name: 'commons-io', version: '2.7'
 

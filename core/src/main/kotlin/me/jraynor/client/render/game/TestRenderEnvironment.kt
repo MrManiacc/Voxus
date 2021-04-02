@@ -13,6 +13,7 @@ import me.jraynor.client.render.group.RenderGroupBuilder
 import me.jraynor.client.render.systems.AbstractEntityRenderer
 import me.jraynor.common.Transform
 import me.jraynor.common.asset.Assets
+import me.jraynor.util.radians
 import org.joml.Vector3f
 import org.joml.Vector4f
 import org.lwjgl.opengl.GL11
@@ -21,8 +22,10 @@ import java.util.*
 
 /**
  * This is used to testing lighting
+ *
+ * TODO: figure out a better way to create test objects
  */
-class LightingTestRenderer :
+class TestRenderEnvironment :
     AbstractEntityRenderer(Aspect.all(Model::class.java, Transform::class.java, Material::class.java)) {
     private lateinit var shader: Shader
     private val position = Vector3f()
@@ -32,23 +35,18 @@ class LightingTestRenderer :
      */
     override fun initialize() {
         master["viewport", RenderGroupBuilder.Priority.HIGH].main(this::renderGrid, RenderGroupBuilder.Priority.HIGH)
-        this.shader = Assets.new<ShaderData, Shader>("basic", true)!!
-        val sphereModel: Model =
-            Assets.new("sphere", true, ModelData(mutableListOf(MeshFactory.generateSphere(32, 32))))!!
+        this.shader = Assets.new<ShaderData, Shader>("voxel", true)!!
+        val voxTest = Assets.new<ModelData, Model>("castle", true)!!
         world.createEntity().edit()
-            .add(sphereModel)
-            .add(Transform(Vector3f(0f, 5f, 0f), scale = Vector3f(5f)))
-            .add(Material(Vector4f(1f, 0.2f, 0.2f, 1f)))
-        world.createEntity().edit()
-            .add(sphereModel)
-            .add(Transform(Vector3f(10f, 5f, 20f), scale = Vector3f(5f)))
+            .add(voxTest)
+            .add(Transform(Vector3f(10f, 5f, 20f), scale = Vector3f(100f), rotation = Vector3f(270f, 0f, 0f)))
             .add(Material(Vector4f(0.3f, 0.7f, 0.321f, 1f)))
-
         tagManager.register(
             "test_light", world.createEntity()
                 .edit()
-                .add(Light(Vector3f(50f, 20f, 0f), Vector3f(0.64f, 0.24f, 0.8f)))
+                .add(Light(Vector3f(-10f, 40f, 25f), Vector3f(1f)))
                 .entity
+
         )
     }
 

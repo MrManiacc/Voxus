@@ -1,4 +1,4 @@
-package me.jraynor.client.opengl
+package me.jraynor.client.opengl.camera
 
 import com.artemis.Component
 import me.jraynor.client.render.util.EditorComponent
@@ -12,7 +12,7 @@ import org.joml.Matrix4f
  * This will create
  */
 data class FirstPersonCamera(
-        val fov: Float = 120f,
+        val fov: Float = 80f,
         var aspect: Float = 1f,
         val near: Float = 0.1f,
         val far: Float = 1000f
@@ -29,10 +29,11 @@ data class FirstPersonCamera(
     fun projection(aspect: Float? = null): Matrix4f {
         if (aspect != null)
             this.aspect = aspect
-        return projectionMatrix.identity().perspective(fov.radians, aspect!!, near, far)
+        return projectionMatrix.identity().perspective(fov.radians, this.aspect, near, far)
     }
 
     /**
+     * s
      * This will return the model matrix using the transform to update it's self
      */
     fun model(transform: Transform): Matrix4f {

@@ -6,7 +6,7 @@ import me.jraynor.common.asset.Asset
 /**
  * This will load all of the meshes into memory.
  */
-class Model(name: String = "no_name") : Asset<ModelData>(name, ModelData::class.java, "obj", "models") {
+class Model(name: String = "no_name") : Asset<ModelData>(name, ModelData::class.java, "vox", "models") {
     private val vaos = ArrayList<Vao>()
 
     /**
