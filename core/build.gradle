@@ -1,15 +1,32 @@
+import org.apache.commons.io.FileExistsException
+import org.apache.commons.io.FileUtils
+import org.gradle.internal.os.OperatingSystem
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'commons-io:commons-io:2.7'
+    }
+}
+plugins {
+    id 'application'
+}
+project.ext.root = new File("$projectDir/src/main/resources/natives")
+
 repositories {
     mavenCentral()
 }
-
 dependencies {
+    compile group: 'commons-io', name: 'commons-io', version: '2.7'
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
     /**ECS related**/
     compile "net.onedaybeard.artemis:artemis-odb:2.3.0"
     compile "net.mostlyoriginal.artemis-odb:contrib-core:2.4.0"
     compile "net.mostlyoriginal.artemis-odb:contrib-eventbus:2.4.0"
     compile "net.mostlyoriginal.artemis-odb:contrib-network:2.4.0"
-    compile "me.lignum:JVox:1.0"
+    compile files("${rootDir.path}/libs/jvox.jar")
     /**Misc**/
     compile group: 'commons-io', name: 'commons-io', version: '2.7'
 
@@ -22,15 +39,72 @@ dependencies {
     implementation "org.lwjgl:lwjgl-stb"
     implementation "org.lwjgl:lwjgl-par"
     implementation "org.joml:joml:1.10.1"
-    runtimeOnly "org.lwjgl:lwjgl::natives-windows"
-    runtimeOnly "org.lwjgl:lwjgl-assimp::natives-windows"
-    runtimeOnly "org.lwjgl:lwjgl-glfw::natives-windows"
-    runtimeOnly "org.lwjgl:lwjgl-opengl::natives-windows"
-    runtimeOnly "org.lwjgl:lwjgl-stb::natives-windows"
-    runtimeOnly "org.lwjgl:lwjgl-par::natives-windows"
+    runtime platform("org.lwjgl:lwjgl-bom:3.2.3")
+    runtime "org.lwjgl:lwjgl::natives-$platform"
+    runtime "org.lwjgl:lwjgl-assimp::natives-$platform"
+    runtime "org.lwjgl:lwjgl-glfw::natives-$platform"
+    runtime "org.lwjgl:lwjgl-opengl::natives-$platform"
+    runtime "org.lwjgl:lwjgl-stb::natives-$platform"
+    runtime "org.lwjgl:lwjgl-par::natives-$platform"
 
     /**Imgui related**/
     implementation 'io.github.spair:imgui-java-lwjgl3:1.82.0'
-    implementation 'io.github.spair:imgui-java-natives-windows:1.82.0'
+    runtime "io.github.spair:imgui-java-natives-$platform:1.82.0"
     implementation 'io.github.spair:imgui-java-binding:1.82.0'
+}
+
+/**
+ * This should extract all of the natives from the files.
+ */
+task extractNative(type: Copy) {
+    configurations.runtime.each {
+        if (it.absolutePath.contains("native")) {
+            from zipTree(it)
+            include "**/*.dylib"
+            into project.ext.root
+            includeEmptyDirs = false
+        }
+    }
+    doLast {
+        moveFiles(project.ext.root)
+    }
+}
+/**
+ * This will properly run the main and if it's on mac it will use the correct args
+ */
+run {
+    mainClassName = "MainKt"
+    if (OperatingSystem.current() == OperatingSystem.MAC_OS) {
+        dependsOn extractNative
+        jvmArgs = ["-Djava.library.path=${project.ext.root}", "-XstartOnFirstThread",]
+    }
+}
+
+/**
+ * This will move our natives.
+ */
+private static def moveFiles(def root) {
+    def children = root.listFiles()
+    moveChildren(root, root, children)
+}
+/**
+ * This will remove the children from the given path to
+ * @param File
+ */
+private static def moveChildren(File root, File current, File[] children) {
+    for (File child : children) {
+        if (child.isFile()) {
+            try {
+                FileUtils.moveFileToDirectory(child, root, true)
+            }catch(Exception ex){
+                child.delete()
+            }
+        } else {
+            moveChildren(root, child, child.listFiles())
+        }
+    }
+    if (current.listFiles().size() <= 0) {
+        current.deleteDir()
+    }
+
 }

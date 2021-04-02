@@ -19,8 +19,6 @@ import org.lwjgl.glfw.GLFW
  * This is kind of a wrapper around imgui for ease of use with kotlin.
  */
 class Gui(private val window: WindowSystem) {
-    /**The ImGuiNodeEditor's context.**/
-    private var nodeEditorContext = NodeEditorContext()
 
     /**The constant dockspace id for the main dockspace.**/
     private val dockspace = "main_dockspace"
@@ -45,7 +43,7 @@ class Gui(private val window: WindowSystem) {
         if (!initialized) {
             initImGui()
             imGuiGlfw.init(window.handle!!, true);
-            imGuiGl3.init();//Use default version of #130
+            imGuiGl3.init("#version 150");//Use default version of #130
             initialized = true
             println("Created the render context!")
         }
@@ -238,8 +236,6 @@ class Gui(private val window: WindowSystem) {
      */
     fun destroy() {
         if (initialized) {
-            nodeEditorContext.destroy()
-            this.nodeEditorContext = NodeEditorContext()
             println("Destroyed node editor context!")
         }
     }
