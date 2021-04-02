@@ -1,0 +1,9 @@
+rootProject.name = 'Voxus'
+
+include ':core'
+
+/**We just simply don't need the src root.**/
+def rootSrc = new File(rootDir, "src")
+if (rootSrc.exists())
+    rootSrc.deleteDir()
+

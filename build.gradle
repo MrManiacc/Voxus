@@ -1,0 +1,26 @@
+
+
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.4.31'
+}
+
+/**We want to add kotlin stdlib to each project.**/
+allprojects {
+    group 'me.jraynor'
+    apply plugin: 'kotlin'
+
+    repositories {
+        mavenCentral()
+        maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
+    }
+
+    dependencies {
+        implementation 'org.jetbrains.kotlin:kotlin-stdlib'
+    }
+
+    compileKotlin {
+        kotlinOptions.jvmTarget = "15"
+    }
+
+
+}
