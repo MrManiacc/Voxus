@@ -31,12 +31,22 @@ abstract class PropertyComponent : EditorComponent() {
     /**
      * This will set the given property with the given name
      */
-    operator fun set(name: String, property: Any) {
-        val type = property::class
+    inline operator fun <reified T : Any> set(name: String, property: T) {
+        val type = T::class
         if (!properties.containsKey(type))
             properties[type] = HashMap()
         properties[type]?.set(name, property)
     }
+//
+//    /**
+//     * This will set the given property with the given name
+//     */
+//    operator fun set(name: String, property: Any) {
+//        val type = property::class
+//        if (!properties.containsKey(type))
+//            properties[type] = HashMap()
+//        properties[type]?.set(name, property)
+//    }
 
     /**
      * This will remove the specified property, or all of the given type if [name] is null

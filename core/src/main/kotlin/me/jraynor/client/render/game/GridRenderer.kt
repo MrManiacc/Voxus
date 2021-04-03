@@ -46,7 +46,6 @@ class GridRenderer : AbstractRenderer() {
             shader.loadVec3("camera", pos)
             gridModel.draw(true)
             shader.stop()
-
         }
     }
 }

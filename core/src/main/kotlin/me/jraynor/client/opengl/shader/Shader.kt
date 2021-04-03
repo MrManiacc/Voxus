@@ -1,5 +1,6 @@
 package me.jraynor.client.opengl.shader
 
+import me.jraynor.client.opengl.model.texture.Texture
 import me.jraynor.common.asset.Asset
 import org.joml.Matrix4f
 import org.joml.Vector2i
@@ -42,7 +43,7 @@ class Shader(name: String) : Asset<ShaderData>(name, ShaderData::class.java, "gl
         if (GL20.glGetShaderi(vertexId!!, GL20.GL_COMPILE_STATUS) == GL11.GL_FALSE) {
             val error = GL20.glGetShaderInfoLog(vertexId!!)
             println(
-                    "Failed to compile vertex shader[$name], with error: $error, for source: \n${data.vertexSource}"
+                "Failed to compile vertex shader[$name], with error: $error, for source: \n${data.vertexSource}"
             )
             return false
         }
@@ -51,12 +52,12 @@ class Shader(name: String) : Asset<ShaderData>(name, ShaderData::class.java, "gl
         GL20.glCompileShader(fragmentId!!)
         if (GL20.glGetShaderi(fragmentId!!, GL20.GL_COMPILE_STATUS) == GL11.GL_FALSE) {
             println(
-                    "Failed to compile fragment shader[$name], with error: \n${
-                        GL20.glGetShaderInfoLog(
-                                fragmentId!!,
-                                500
-                        )
-                    }\nfor source: \n${data.fragmentSource}"
+                "Failed to compile fragment shader[$name], with error: \n${
+                    GL20.glGetShaderInfoLog(
+                        fragmentId!!,
+                        500
+                    )
+                }\nfor source: \n${data.fragmentSource}"
             )
             return false
         }
@@ -123,6 +124,22 @@ class Shader(name: String) : Asset<ShaderData>(name, ShaderData::class.java, "gl
     fun loadVec3(name: String?, vec: Vector3f) {
         if (compiled)
             if (uniforms.containsKey(name)) GL20.glUniform3f(uniforms[name]!!, vec.x, vec.y, vec.z)
+    }
+
+    /**
+     * Pass a vec3 to a shader
+     *
+     * @param name the uniforms name
+     * @param vec  the vec to passed to the shader
+     */
+    fun loadTexture(name: String, slot: Int) {
+        if (compiled) {
+            if (uniforms.containsKey(name)) {
+                val pos = uniforms[name]!!
+                println(pos)
+                GL20.glUniform1i(uniforms[name]!!, slot)
+            }
+        }
     }
 
     /**

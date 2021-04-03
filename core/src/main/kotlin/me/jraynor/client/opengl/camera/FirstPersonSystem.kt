@@ -75,7 +75,6 @@ class FirstPersonSystem() :
 
             val ox = Input.dy.toFloat()
             val oy = Input.dx.toFloat()
-            println("deltaX: $dx, deltaY: $dy, originalX: $ox, originalY: $oy")
             transform.rotate(
                 (((dy.toFloat() / setting.verticalSensitivity) * world.delta)),
                 ((dx.toFloat() / setting.horizontalSensitivity) * world.delta),

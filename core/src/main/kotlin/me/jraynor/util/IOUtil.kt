@@ -42,28 +42,17 @@ class IOUtil {
      * @throws IOException if an IO error occurs
      */
     @Throws(IOException::class)
-    fun ioResourceToByteBuffer(resource: String, bufferSize: Int): ByteBuffer? {
+    fun ioResourceToByteBuffer(source: InputStream, bufferSize: Int): ByteBuffer? {
         var buffer: ByteBuffer
-        val path = Paths.get(resource)
-        if (Files.isReadable(path)) {
-            Files.newByteChannel(path).use { fc ->
-                buffer = createByteBuffer(fc.size().toInt() + 1)
-                while (fc.read(buffer) != -1) {
+        Channels.newChannel(source).use { rbc ->
+            buffer = createByteBuffer(bufferSize)
+            while (true) {
+                val bytes: Int = rbc.read(buffer)
+                if (bytes == -1) {
+                    break
                 }
-            }
-        } else {
-            IOUtil::class.java.classLoader.getResourceAsStream(resource).use { source ->
-                Channels.newChannel(source!!).use { rbc ->
-                    buffer = createByteBuffer(bufferSize)
-                    while (true) {
-                        val bytes: Int = rbc.read(buffer)
-                        if (bytes == -1) {
-                            break
-                        }
-                        if (buffer.remaining() === 0) {
-                            buffer = resizeBuffer(buffer, buffer.capacity() * 3 / 2) // 50%
-                        }
-                    }
+                if (buffer.remaining() === 0) {
+                    buffer = resizeBuffer(buffer, buffer.capacity() * 3 / 2) // 50%
                 }
             }
         }

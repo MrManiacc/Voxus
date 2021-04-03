@@ -4,6 +4,7 @@ import com.artemis.World
 import com.artemis.WorldConfigurationBuilder
 import me.jraynor.client.ClientPlugin
 import me.jraynor.common.CommonPlugin
+import me.jraynor.common.asset.Assets
 import me.jraynor.server.ServerPlugin
 import me.jraynor.util.side.Side
 import net.mostlyoriginal.api.event.common.EventSystem
@@ -38,6 +39,7 @@ class Voxus(private val side: Side) {
             process(dt / 1000f)
         }
         world?.dispose()
+        Assets.disposeAll(true)
     }
 
     /**This should process the engine with the given delta time**/

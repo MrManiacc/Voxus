@@ -1,6 +1,7 @@
 package me.jraynor.client.opengl.camera
 
 import com.artemis.Component
+import imgui.ImGui
 import me.jraynor.client.render.util.EditorComponent
 import me.jraynor.common.Transform
 import me.jraynor.common.util.degrees
@@ -68,4 +69,10 @@ data class CameraSettings(
         val verticalSensitivity: Float = 50f,
         val horizontalSensitivity: Float = 50f,
         val walkSpeed: Float = 25f
-) : EditorComponent()
+) : EditorComponent(){
+    override fun render() {
+        super.render()
+        ImGui.text("fps: ${ImGui.getIO().framerate}")
+        ImGui.text("ms: ${ImGui.getIO().framerate / 1000f}")
+    }
+}

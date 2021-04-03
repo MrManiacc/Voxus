@@ -1,15 +1,14 @@
 package me.jraynor.client.parse
 
-import assimp.AiColor3D
-import assimp.AiMaterial
-import assimp.AiScene
-import assimp.AiTexture
+import assimp.*
+import glm_.toInt
 import me.jraynor.client.opengl.model.material.Material
 import me.jraynor.client.opengl.model.material.MaterialData
 import me.jraynor.client.opengl.model.texture.Texture
 import org.joml.Vector3f
 import resourcePath
 import java.io.File
+import java.nio.file.Paths
 
 /**
  * This will parse all of the material data from the scene and store it inside the
@@ -49,8 +48,15 @@ object MaterialParser {
         val key = (textureIn.type ?: return).name
         val texture = Texture()
         material[key] = texture
+        texture["type"] = textureIn.type!!
         texture["path"] = file
-        texture.readTexture()
+        Material::class.java.getResource("/models/$name")?.toURI()?.let {
+            val filePath = Paths.get(it);
+            texture.readTexture(filePath)
+
+            texture["uri"] = it
+        }
+
     }
 
     /**

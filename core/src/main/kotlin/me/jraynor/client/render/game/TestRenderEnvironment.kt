@@ -40,7 +40,7 @@ class TestRenderEnvironment :
 
         world.createEntity().edit()
             .add(Assets.new<ModelData, Model>("red_night", true)!!)
-            .add(Transform(Vector3f(0f, 5f, 0f), scale = Vector3f(10f), rotation = Vector3f(270f, 180f, 0f)))
+            .add(Transform(Vector3f(0f, 5f, 0f), scale = Vector3f(10f), rotation = Vector3f(0f, 180f, 0f)))
             .add(Material())
 
 //        world.createEntity().edit()
@@ -66,16 +66,15 @@ class TestRenderEnvironment :
             shader.loadMat4("projectionMatrix", projection)
             shader.loadMat4("viewMatrix", view)
             entities.forEach {
-                val light = lights.get(tagManager.getEntity("test_light"))
+//                val light = lights.get(tagManager.getEntity("test_light"))
                 val transform = transforms.get(it)!!
                 val model = models.get(it)!!
 //                val material = materials.get(it)!!
 //                material.load("material", shader)
-                shader.loadVec4("material.color", color)
-                light.load("light", shader)
-                shader.loadVec3("camera", pos)
+//                light.load("light", shader)
+//                shader.loadVec3("camera", pos)
                 shader.loadMat4("modelMatrix", transform.matrix(true))
-                model.render()
+                model.render(shader)
             }
             shader.stop()
         }

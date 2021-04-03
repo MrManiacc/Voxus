@@ -1,6 +1,7 @@
 package me.jraynor.common.asset
 
 import com.artemis.Component
+import me.jraynor.client.render.util.EditorComponent
 import resourcePath
 import java.io.InputStream
 import java.lang.Exception
@@ -134,7 +135,7 @@ abstract class Asset<T : AssetData>(
     private val dataClass: Class<T>,
     private val extension: String,
     private val container: String
-) : Component() {
+) : EditorComponent() {
     private var data: T? = null
     private var loaded = false
 

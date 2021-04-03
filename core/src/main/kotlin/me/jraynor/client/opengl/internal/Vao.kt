@@ -3,6 +3,7 @@ package me.jraynor.client.opengl.internal
 import me.jraynor.client.opengl.model.mesh.Mesh
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL15
 import org.lwjgl.opengl.GL15.*
 import org.lwjgl.opengl.GL20
 import org.lwjgl.opengl.GL30
@@ -71,6 +72,8 @@ class Vao(private var mesh: Mesh? = null) {
         GL30.glBindVertexArray(id)
         vbos.forEach {
             GL20.glEnableVertexAttribArray(it.key)
+            it.value.bind()
+
         }
     }
 
@@ -93,6 +96,7 @@ class Vao(private var mesh: Mesh? = null) {
      */
     fun unbind() {
         vbos.forEach {
+            it.value.unbind()
             GL20.glDisableVertexAttribArray(it.key)
         }
         GL30.glBindVertexArray(0)
@@ -110,12 +114,12 @@ class Vao(private var mesh: Mesh? = null) {
             vbo.bind()
             vbo.storeData(data)
             GL20.glVertexAttribPointer(
-                    attribute,
-                    attributeSize,
-                    GL11.GL_FLOAT,
-                    false,
-                    0,
-                    0
+                attribute,
+                attributeSize,
+                GL11.GL_FLOAT,
+                false,
+                0,
+                0
             )
             vbo.unbind()
             vbos[attribute] = vbo
@@ -200,7 +204,7 @@ class Vao(private var mesh: Mesh? = null) {
      * The end user will never interact with this, it's entirely internal
      */
     private class Vbo(
-            private val type: Int
+        private val type: Int
     ) {
         private var vboId: Int = -1
 

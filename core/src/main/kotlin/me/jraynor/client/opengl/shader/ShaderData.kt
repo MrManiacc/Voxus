@@ -25,6 +25,11 @@ class ShaderData : AssetData() {
                 };
             """
         ), Pair(
+            "Material", """
+                uniform sampler2D diffuse;
+            """
+        ),
+        Pair(
             "BasicLight", """
                    struct Light {
                     vec3 pos;
@@ -59,7 +64,8 @@ class ShaderData : AssetData() {
         mapStructs(vertexSource!!)
         mapStructs(fragmentSource!!)
         mapBinds(vertexSource!!)
-        mapUniforms(source)
+        mapUniforms(vertexSource!!)
+        mapUniforms(fragmentSource!!)
         return true
     }
 
@@ -67,6 +73,7 @@ class ShaderData : AssetData() {
      * This will replace the imports correctly
      */
     private fun mapImports(input: String): String {
+        if (!input.contains("#import")) return input
         var text = input
         while (text.contains("#import")) {
             val start = text.indexOf("#import")
@@ -125,6 +132,7 @@ class ShaderData : AssetData() {
     }
 
     private fun mapStructs(source: String) {
+        if (!source.contains("struct")) return
         val lines = source.asList()
         var lastStructName = ""
         var struct: Struct? = null

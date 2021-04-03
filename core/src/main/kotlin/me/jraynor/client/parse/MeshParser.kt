@@ -29,6 +29,7 @@ object MeshParser {
      */
     private fun parseMesh(meshIn: AiMesh): Mesh {
         val mesh = Mesh()
+        mesh.materialIndex = meshIn.materialIndex
         val vertices = ArrayList<Float>()
         val normals = ArrayList<Float>()
         val uvs = ArrayList<Float>()
@@ -46,26 +47,31 @@ object MeshParser {
                 normals.add(normal.y)
                 normals.add(normal.z)
             }
-            if (meshIn.hasTextureCoords(0)) {
-                val uv = Vector2f(meshIn.textureCoords[0][i][0], meshIn.textureCoords[0][i][1])
-                uvs.add(uv.x)
-                uvs.add(uv.y)
+            if (meshIn.textureCoords.size > 0) {
+
+                if (meshIn.hasTextureCoords(0)) {
+                    val uv = Vector2f(meshIn.textureCoords[0][i][0], meshIn.textureCoords[0][i][1])
+                    uvs.add(uv.x)
+                    uvs.add(uv.y)
+                }
+            } else {
+                uvs.add(0f)
+                uvs.add(0f)
             }
         }
         mesh.with(vertices.toFloatArray(), 0, 3)
-        mesh.with(normals.toFloatArray(), 1, 3)
-        mesh.with(uvs.toFloatArray(), 2, 2)
+//        mesh.with(normals.toFloatArray(), 1, 3)
+        mesh.with(uvs.toFloatArray(), 1, 2)
 
-        if (meshIn.hasFaces()) {
-            val indices = ArrayList<Int>()
-            for (i in 0 until meshIn.numFaces) {
-                val faces = meshIn.faces[i]
-                for (j in 0 until faces.size) {
-                    indices.add(faces[j])
-                }
+        val indices = ArrayList<Int>()
+        for (i in 0 until meshIn.numFaces) {
+            val faces = meshIn.faces[i]
+//            if(faces.size < 3) continue
+            for (j in 0 until faces.size) {
+                indices.add(faces[j])
             }
-            mesh.with(indices.toIntArray())
         }
+        mesh.with(indices.toIntArray())
 
         return mesh
     }

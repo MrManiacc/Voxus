@@ -31,7 +31,8 @@ abstract class AbstractEntityRenderer(aspect: Aspect.Builder) : EntitySystem(asp
     /**
      * This will allow for easy rendering
      */
-    protected fun doRender(renderable: (projection: Matrix4f, view: Matrix4f, viewPos: Vector3f) -> Unit) {
+    protected fun 
+            doRender(renderable: (projection: Matrix4f, view: Matrix4f, viewPos: Vector3f) -> Unit) {
         val localPlayer = tagManager.getEntity("local_player")
         localPlayer ?: return
         val playerCamera = cameras.get(localPlayer)

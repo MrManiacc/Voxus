@@ -1,5 +1,7 @@
 package me.jraynor.client.opengl.model.texture
 
+import assimp.AiTexture
+import com.jogamp.opengl.GL.GL_TEXTURE0
 import gli_.gl
 import gln.texture.glBindTexture
 import gln.texture.glTexParameteri
@@ -15,6 +17,11 @@ import java.nio.IntBuffer
 
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE
+import org.lwjgl.opengl.GL12.glTexParameteri
+import org.lwjgl.opengl.GL13.glActiveTexture
+import java.io.InputStream
+import java.net.URI
+import java.nio.file.Path
 import kotlin.experimental.and
 import kotlin.math.round
 
@@ -22,8 +29,7 @@ import kotlin.math.round
 /**
  * This allows us to store texture data very easily
  */
-class Texture : PropertyComponent() {
-    private var textureId: Int = -1
+data class Texture(var textureId: Int = -1) : PropertyComponent() {
     private val util = IOUtil()
 
     /**Used to check to see if the texture is loaded into memory or not**/
@@ -38,30 +44,45 @@ class Texture : PropertyComponent() {
     /**This will get the texture component**/
     val comp: Int get() = this["comp"] ?: -1
 
+    /**gets the uri**/
+    val uri: URI? get() = this["uri"]
+
+    /**gets the texture by the given type**/
+    val type: AiTexture.Type? get() = this["type"]
+
+    /**gets the file path**/
+    val file: File? get() = this["path"]
+
+    /**Stores the buffer data**/
+    private var image: ByteBuffer? = null
+
+    var textureType = GL11.GL_TEXTURE_2D
+
+    /**stores all of the parmater types**/
+    private val params: MutableList<IntTexParameter> = ArrayList()
 
     /**
      * This will load the given texture
      */
-    fun readTexture() {
-        ifPresent<File>("path") {
-            val stack = stackPush()
-            val w: IntBuffer = stack.mallocInt(1)
-            val h: IntBuffer = stack.mallocInt(1)
-            val comp: IntBuffer = stack.mallocInt(1)
-            val bufferData = util.ioResourceToByteBuffer(it.absolutePath, 8 * 1024) ?: return@ifPresent
-            // Use info to read image metadata without decoding the entire image.
-            // We don't need this for this demo, just testing the API.
-            if (!stbi_info_from_memory(bufferData, w, h, comp)) {
-                throw RuntimeException("Failed to read image information: " + stbi_failure_reason());
-            } else {
-                println("OK with reason: " + stbi_failure_reason());
-            }
-            // Decode the image
-            this["image"] = stbi_load_from_memory(bufferData, w, h, comp, 0) ?: return@ifPresent
-            this["width"] = w.get(0)
-            this["height"] = h.get(0)
-            this["comp"] = comp.get(0)
+    fun readTexture(path: Path) {
+        val stack = stackPush()
+        val w: IntBuffer = stack.mallocInt(1)
+        val h: IntBuffer = stack.mallocInt(1)
+        val comp: IntBuffer = stack.mallocInt(1)
+//        val bufferData = util.ioResourceToByteBuffer(path.toString()z, 8 * 1024) ?: return
+        // Use info to read image metadata without decoding the entire image.
+        // We don't need this for this demo, just testing the API.
+        if (!stbi_info(path.toString(), w, h, comp)) {
+            throw RuntimeException("Failed to read image information: " + stbi_failure_reason());
+        } else {
+            println("OK with reason: " + stbi_failure_reason());
         }
+        // Decode the image
+        image = stbi_load(path.toString(), w, h, comp, 4) ?: error(stbi_failure_reason()!!)
+        this["width"] = w.get(0)
+        this["height"] = h.get(0)
+        this["comp"] = comp.get(0)
+
     }
 
     /**
@@ -69,10 +90,10 @@ class Texture : PropertyComponent() {
      */
     fun defaults() {
         this["target"] = gl.Target._2D
-        add(IntTexParameter(gl.Target._2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR))
-        add(IntTexParameter(gl.Target._2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR))
-        add(IntTexParameter(gl.Target._2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE))
-        add(IntTexParameter(gl.Target._2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE))
+        params.add(IntTexParameter(textureType, GL_TEXTURE_MIN_FILTER, GL_NEAREST))
+        params.add(IntTexParameter(textureType, GL_TEXTURE_MAG_FILTER, GL_NEAREST))
+        params.add(IntTexParameter(textureType, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE))
+        params.add(IntTexParameter(textureType, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE))
     }
 
     private fun premultiplyAlpha() {
@@ -93,51 +114,53 @@ class Texture : PropertyComponent() {
     /**
      * This will correctly bind the texture
      */
-    fun bind() {
+    fun bind(unit: Int = 0, type: Int = textureType) {
         if (textureId != -1) return
-        val target: gl.Target = this["target"] ?: gl.Target._2D //By default it will be a texture 2d
-        glBindTexture(target, textureId)
+        glActiveTexture(GL_TEXTURE0 + unit)
+        glBindTexture(type, textureId)
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
     }
 
     /**
      * this will load the texture
      */
     fun reload(force: Boolean = false) {
-        if (force) dispose()
-        if (textureId != -1) return
-        ifPresent<ByteBuffer>("image") {
-            val target: gl.Target = this["target"] ?: gl.Target._2D //By default it will be a texture 2d
-            this.textureId = glGenTextures()
-            glBindTexture(target, textureId);
-            forEach<IntTexParameter> { _, property ->
-                glTexParameteri(property.target, property.name, property.parameter)
-            }
+//        if (force) dispose()
+        glEnable(GL_TEXTURE_2D);
+        val it = image ?: return
+        this.textureId = glGenTextures()
+        bind(0)
 
-            val format = if (comp == 3) {
-                if (width and 3 != 0) {
-                    glPixelStorei(GL_UNPACK_ALIGNMENT, 2 - (width and 1))
-                }
-                GL_RGB
-            } else {
-                premultiplyAlpha()
-                glEnable(GL_BLEND)
-                glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
-                GL_RGBA;
-            }
-
-            glTexImage2D(
-                target.i,
-                0,
-                format,
-                width,
-                height,
-                0,
-                format,
-                GL_UNSIGNED_BYTE,
-                it
-            ) //This actually uploads the buffer datea
-
+        this.params.forEach {
+            glTexParameteri(textureType, it.name, it.parameter)
         }
+
+        val format = if (comp == 3) {
+            GL_RGB8
+        } else {
+//            premultiplyAlpha()
+//            glEnable(GL_BLEND)
+//            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+            GL_RGBA8;
+        }
+
+        glTexImage2D(
+            textureType,
+            0,
+            GL_RGBA8,
+            width,
+            height,
+            0,
+            GL_RGBA,
+            GL_UNSIGNED_BYTE,
+            it
+
+        ) //This actually uploads the buffer datea
+        unbind()
+    }
+
+    fun unbind() {
+        glBindTexture(textureType, 0)
     }
 
 
@@ -149,17 +172,14 @@ class Texture : PropertyComponent() {
             glDeleteTextures(textureId)
             textureId = -1
         }
-        ifPresent<ByteBuffer>("image") {
-            it.clear()
-            remove<ByteBuffer>("image")//We no longer need the image data
-        }
-
+        image?.clear()
+        image = null
     }
 
     /**
      * This allows use to provide texture parameters easily
      */
-    data class IntTexParameter(val target: gl.Target, val name: Int, val parameter: Int)
+    data class IntTexParameter(val target: Int, val name: Int, val parameter: Int)
 
 
 }
