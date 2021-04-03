@@ -6,11 +6,14 @@ import com.artemis.Entity
 import com.artemis.managers.TagManager
 import com.artemis.systems.EntityProcessingSystem
 import me.jraynor.client.input.Input
+import me.jraynor.client.window.WindowSystem
 import me.jraynor.common.Transform
 import me.jraynor.common.util.degrees
 import org.joml.Vector3f
 import org.lwjgl.opengl.GL11
 import kotlin.math.cos
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sin
 
 /**
@@ -24,10 +27,12 @@ class FirstPersonSystem() :
             CameraSettings::class.java
         )
     ) {
-
+    private lateinit var window: WindowSystem
     private lateinit var tagManager: TagManager
     private lateinit var transforms: ComponentMapper<Transform>
     private lateinit var settings: ComponentMapper<CameraSettings>
+    private var mouseX: Double = 0.0
+    private var mouseY: Double = 0.0
 
     override fun initialize() {
         if (!tagManager.isRegistered("local_player")) {
@@ -51,19 +56,29 @@ class FirstPersonSystem() :
             GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
         }
 
-        val transform = transforms!!.get(e)
+        val transform = transforms.get(e)
 
-        val setting = settings!!.get(e)
+        val setting = settings.get(e)
         if (Input.keyPressed(Input.KEY_ENTER))
             Input.grabbed = !Input.grabbed
 
         if (Input.grabbed) {
             if (Input.keyPressed(Input.KEY_ESCAPE))
                 Input.grabbed = false
+            val startMousePos = window.mousePos
+            val currentX = startMousePos.x
+            val currentY = startMousePos.y
+            val dx = currentX - mouseX
+            val dy = currentY - mouseY
+            this.mouseX = currentX
+            this.mouseY = currentY
 
+            val ox = Input.dy.toFloat()
+            val oy = Input.dx.toFloat()
+            println("deltaX: $dx, deltaY: $dy, originalX: $ox, originalY: $oy")
             transform.rotate(
-                (((Input.dy.toFloat() / setting.verticalSensitivity) * world.delta)),
-                ((Input.dx.toFloat() / setting.horizontalSensitivity) * world.delta),
+                (((dy.toFloat() / setting.verticalSensitivity) * world.delta)),
+                ((dx.toFloat() / setting.horizontalSensitivity) * world.delta),
                 0f
             )
             val rads = (transform.rotation!!.y).degrees

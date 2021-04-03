@@ -1,5 +1,7 @@
 package me.jraynor.client.input
 
+import org.joml.Vector2d
+
 /**
  * This class is used as the input mappings. it will store the current keystates
  */
@@ -149,9 +151,6 @@ object Input {
     var my: Double = 0.0
     var dx: Double = 0.0
     var dy: Double = 0.0
-    private const val resetTime = 100000000 //5th of a second for double click.
-            .toLong()
-    private var lastResetTime = System.nanoTime()
     var grabbed = false
 
     init {
@@ -183,6 +182,8 @@ object Input {
         mx = x
         my = y
     }
+
+
 
 
     /**

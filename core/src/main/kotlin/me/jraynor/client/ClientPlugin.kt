@@ -33,10 +33,9 @@ class ClientPlugin(private val voxus: Voxus) : ArtemisPlugin {
         builder.with(FirstPersonSystem())
         builder.with(WorldConfigurationBuilder.Priority.LOW, RenderMaster())
         builder.with(WorldConfigurationBuilder.Priority.LOWEST, object : BaseSystem() {
-            var windowSystem: WindowSystem? = null
+            private lateinit var windowSystem: WindowSystem
             override fun processSystem() {
-                if (windowSystem != null)
-                    windowSystem!!.poll()
+                windowSystem.poll()
             }
         })//Lowest priority because we want it to be called last, because that's when the poll.
 

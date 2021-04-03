@@ -188,7 +188,7 @@ abstract class Asset<T : AssetData>(
             var dataStream: InputStream? = stream
             if (dataStream == null)
                 dataStream = this.inputStream
-            var valid = data!!.load("$resourcePath/${data!!.path!!}")
+            var valid = data!!.load("$resourcePath${data!!.path!!}")
             if (!valid)
                 valid = data!!.load(dataStream!!)
             if (valid && data != null) {

@@ -33,15 +33,14 @@ dependencies {
     /**Opengl related**/
     implementation platform("org.lwjgl:lwjgl-bom:3.2.3")
     implementation "org.lwjgl:lwjgl"
-    implementation "org.lwjgl:lwjgl-assimp"
     implementation "org.lwjgl:lwjgl-glfw"
     implementation "org.lwjgl:lwjgl-opengl"
     implementation "org.lwjgl:lwjgl-stb"
     implementation "org.lwjgl:lwjgl-par"
     implementation "org.joml:joml:1.10.1"
+    implementation 'com.github.kotlin-graphics:assimp:v4.0'
     runtime platform("org.lwjgl:lwjgl-bom:3.2.3")
     runtime "org.lwjgl:lwjgl::natives-$platform"
-    runtime "org.lwjgl:lwjgl-assimp::natives-$platform"
     runtime "org.lwjgl:lwjgl-glfw::natives-$platform"
     runtime "org.lwjgl:lwjgl-opengl::natives-$platform"
     runtime "org.lwjgl:lwjgl-stb::natives-$platform"
@@ -61,6 +60,7 @@ task extractNative(type: Copy) {
         if (it.absolutePath.contains("native")) {
             from zipTree(it)
             include "**/*.dylib"
+            include "**/*.dll"
             into project.ext.root
             includeEmptyDirs = false
         }
@@ -96,7 +96,7 @@ private static def moveChildren(File root, File current, File[] children) {
         if (child.isFile()) {
             try {
                 FileUtils.moveFileToDirectory(child, root, true)
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 child.delete()
             }
         } else {

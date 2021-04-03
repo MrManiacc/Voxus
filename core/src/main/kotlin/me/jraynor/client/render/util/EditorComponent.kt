@@ -24,7 +24,7 @@ open class EditorComponent : Component() {
     /**
      * This will be rendered when a component is selected. There will be editable elements to the component
      */
-    fun render() {
+    open fun render() {
         if (!cached)
             cache()
 
@@ -64,7 +64,6 @@ open class EditorComponent : Component() {
     private fun cache() {
         val cls = this::class.java
 
-        println("here")
         cls.declaredFields.forEach {
             val name = it.name
             if (Vector3f::class.java.isAssignableFrom(it.type)) {

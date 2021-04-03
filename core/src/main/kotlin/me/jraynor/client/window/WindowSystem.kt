@@ -4,8 +4,10 @@ import com.artemis.BaseSystem
 import me.jraynor.Voxus
 import me.jraynor.client.input.Input
 import me.jraynor.client.render.util.Gui
+import me.jraynor.common.util.Vec2DfBuf
 import me.jraynor.common.util.Vec2fBuf
 import me.jraynor.common.util.Vec2iBuf
+import org.joml.Vector2d
 import org.joml.Vector2f
 import org.joml.Vector2i
 import org.lwjgl.glfw.*
@@ -29,6 +31,7 @@ class WindowSystem(
     private val windowSize = Vec2iBuf()
     private val framebufferSize = Vec2iBuf()
     private val framebufferScale = Vec2fBuf()
+    private val mousePosBuffer = Vec2DfBuf()
     private val windowPos = Vec2iBuf()
     private var grabbed = false
     val gui: Gui = Gui(this)
@@ -42,7 +45,14 @@ class WindowSystem(
         setupCallbacks()
         gui.init()
     }
-
+    /**
+     * This will get the mouse position
+     */
+    val mousePos: Vector2d
+        get() {
+            handle?.let { glfwGetCursorPos(it, mousePosBuffer.x, mousePosBuffer.y) }
+            return mousePosBuffer.get()
+        }
     /**
      * This allows us access to the gui
      */
@@ -128,6 +138,8 @@ class WindowSystem(
         })
     }
 
+
+
     /**
      * This will finish the window setup
      */
@@ -158,17 +170,17 @@ class WindowSystem(
      * This will manage the input class
      */
     private fun processInput() {
-        Input.reset()
         if (Input.grabbed) {
             if (!grabbed)
                 setGrabbed(true)
         } else {
             if (grabbed) {
-                val size = framebufferSize.get()
+//                val size = framebufferSize.get()
                 setGrabbed(false)
-                GLFW.glfwSetCursorPos(handle!!, size.x / 2.0, size.y / 2.0)
+//                GLFW.glfwSetCursorPos(handle!!, size.x / 2.0, size.y / 2.0)
             }
         }
+        Input.reset()
     }
 
     /**

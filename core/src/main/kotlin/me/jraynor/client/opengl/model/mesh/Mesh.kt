@@ -6,10 +6,13 @@ import me.jraynor.client.opengl.internal.Vao
 /**
  * This is the edit class, it controls the vao
  */
-class Mesh() {
+class Mesh {
     internal val floatBuffers: HashMap<Int, Pair<FloatArray, Int>> = HashMap()
     internal val intBuffers: HashMap<Int, Pair<IntArray, Int>> = HashMap()
     internal var indices: IntArray? = null
+
+    /**The index of the material**/
+    var materialIndex = 0
 
     /**
      * This method will create a float array, and convert if into
@@ -41,5 +44,30 @@ class Mesh() {
     fun make(): Vao {
         return Vao(this)
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Mesh
+
+        if (floatBuffers != other.floatBuffers) return false
+        if (intBuffers != other.intBuffers) return false
+        if (indices != null) {
+            if (other.indices == null) return false
+            if (!indices.contentEquals(other.indices)) return false
+        } else if (other.indices != null) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = floatBuffers.hashCode()
+        result = 31 * result + intBuffers.hashCode()
+        result = 31 * result + (indices?.contentHashCode() ?: 0)
+        return result
+    }
+
+
 }
 

@@ -2,17 +2,21 @@
 
 package me.jraynor.common.util
 
+import assimp.AiFace
+import assimp.AiVector3D
 import com.artemis.*
 import com.artemis.systems.EntityProcessingSystem
-import org.joml.Vector2f
-import org.joml.Vector2i
-import org.joml.Vector3f
-import org.joml.Vector3i
+import org.joml.*
+import org.lwjgl.BufferUtils
+import org.lwjgl.system.MemoryUtil
+import org.lwjgl.system.Pointer
+import org.lwjgl.system.Struct
+import java.lang.Math
+import java.nio.ByteBuffer
 import java.text.DecimalFormat
 import java.util.function.Consumer
 import kotlin.Pair
 import kotlin.reflect.KClass
-
 
 
 /**
@@ -66,6 +70,26 @@ data class Vec2iBuf(
         value.y = heightBuffer[0]
         return value
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Vec2iBuf
+
+        if (!widthBuffer.contentEquals(other.widthBuffer)) return false
+        if (!heightBuffer.contentEquals(other.heightBuffer)) return false
+        if (value != other.value) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = widthBuffer.contentHashCode()
+        result = 31 * result + heightBuffer.contentHashCode()
+        result = 31 * result + value.hashCode()
+        return result
+    }
 }
 
 /**
@@ -81,8 +105,64 @@ data class Vec2fBuf(
         value.y = heightBuffer[0]
         return value
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Vec2fBuf
+
+        if (!widthBuffer.contentEquals(other.widthBuffer)) return false
+        if (!heightBuffer.contentEquals(other.heightBuffer)) return false
+        if (value != other.value) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = widthBuffer.contentHashCode()
+        result = 31 * result + heightBuffer.contentHashCode()
+        result = 31 * result + value.hashCode()
+        return result
+    }
 }
 
+/**
+ * Buffers a [Vector2f] with some arrays
+ */
+data class Vec2DfBuf(
+    val x: DoubleArray = DoubleArray(1),
+    val y: DoubleArray = DoubleArray(1),
+    private val value: Vector2d = Vector2d()
+) {
+
+    fun get(): Vector2d {
+        value.x = x[0]
+        value.y = y[0]
+        return value
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Vec2DfBuf
+
+        if (!x.contentEquals(other.x)) return false
+        if (!y.contentEquals(other.y)) return false
+        if (value != other.value) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = x.contentHashCode()
+        result = 31 * result + y.contentHashCode()
+        result = 31 * result + value.hashCode()
+        return result
+    }
+
+}
 
 fun Vector2i.formatted(): String {
     return this.toString(DecimalFormat.getInstance())
@@ -291,7 +371,6 @@ inline fun <reified T> emptyArrayOfSize(size: Int): Array<T> =
     (arrayOfNulls<T>(size) as Array<T>)
 
 
-
 data class MyPair<A, B>(
     var first: A? = null,
     var second: B? = null
@@ -316,3 +395,26 @@ fun Int.orEquals(vararg ints: Int): Int {
         out = out or element
     return out
 }
+
+
+inline fun <reified T : Struct> wrap(address: Long, container: ByteBuffer): T {
+    val cls = Struct::class.java
+    val method = cls.getDeclaredMethod("wrap", Class::class.java, Long::class.java, ByteBuffer::class.java)
+    method.isAccessible = true
+    val struct = method.invoke(null, T::class.java, address, container)
+    return struct as T
+}
+
+/**
+ * This will convert the mutable list of vec3 to a float array
+ */
+fun MutableList<AiVector3D>.toImmutable(): FloatArray {
+    val array = FloatArray(this.size * 3)
+    this.forEachIndexed { index, vec3 ->
+        array[index] = vec3.x
+        array[index + 1] = vec3.y
+        array[index + 2] = vec3.z
+    }
+    return array
+}
+

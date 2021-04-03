@@ -20,6 +20,7 @@ allprojects {
         mavenCentral()
         maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
         mavenLocal()
+        maven { url 'https://jitpack.io' }
     }
 
     dependencies {
@@ -27,7 +28,7 @@ allprojects {
     }
 
     compileKotlin {
-        kotlinOptions.jvmTarget = "15"
+        kotlinOptions.jvmTarget = "11"
     }
 
 

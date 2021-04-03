@@ -1,22 +1,27 @@
 package me.jraynor.client.opengl.model
 
+import assimp.AiTexture
 import me.jraynor.client.opengl.internal.Vao
+import me.jraynor.client.opengl.model.texture.Texture
 import me.jraynor.common.asset.Asset
 
 /**
  * This will load all of the meshes into memory.
  */
-class Model(name: String = "no_name") : Asset<ModelData>(name, ModelData::class.java, "vox", "models") {
+class Model(name: String = "no_name") : Asset<ModelData>(name, ModelData::class.java, "obj", "models") {
     private val vaos = ArrayList<Vao>()
 
     /**
      * This will load the actual meshes into memory, as well as the textures.
      */
     override fun reload(data: ModelData) {
+        data.matData.forEach { i, material ->
+            material.reload(true)
+        }
         if (vaos.isNotEmpty())
             dispose()
-        data.meshes.forEach {
-            val vao = it.make()
+        data.meshData.forEach { mesh ->
+            val vao = mesh.make()
             vao.load()
             vaos.add(vao)
         }

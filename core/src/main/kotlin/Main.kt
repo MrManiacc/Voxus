@@ -9,7 +9,7 @@ var isDevEnvironment: Boolean = true
 val resourcePath: String
     get() {
         return if (isDevEnvironment)
-            "src/main/resources"
+            "core/src/main/resources"
         else
             "" //TODO: figure out a good place to manage resources in release enviorment.
     }

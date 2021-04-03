@@ -60,7 +60,6 @@ class ShaderData : AssetData() {
         mapStructs(fragmentSource!!)
         mapBinds(vertexSource!!)
         mapUniforms(source)
-        println(uniforms)
         return true
     }
 
@@ -115,7 +114,6 @@ class ShaderData : AssetData() {
                 val type = uniform[0].trim()
                 val name = uniform[1].trim()
                 if (structs.containsKey(type)) {
-                    println(type)
                     val current = structs[type]!!
                     current.uniforms.forEach { structUniform ->
                         this.uniforms.add(Uniform("$name.${structUniform.name}"))
