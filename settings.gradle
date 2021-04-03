@@ -1,6 +1,6 @@
 rootProject.name = 'Voxus'
 
-include ':core'
+include ':core', ":assets"
 
 /**We just simply don't need the src root.**/
 def rootSrc = new File(rootDir, "src")

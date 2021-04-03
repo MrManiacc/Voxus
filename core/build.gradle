@@ -18,17 +18,19 @@ project.ext.root = new File("$projectDir/src/main/resources/natives")
 repositories {
     mavenCentral()
 }
+
 dependencies {
-    compile group: 'commons-io', name: 'commons-io', version: '2.7'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.7'
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
     /**ECS related**/
-    compile "net.onedaybeard.artemis:artemis-odb:2.3.0"
-    compile "net.mostlyoriginal.artemis-odb:contrib-core:2.4.0"
-    compile "net.mostlyoriginal.artemis-odb:contrib-eventbus:2.4.0"
-    compile "net.mostlyoriginal.artemis-odb:contrib-network:2.4.0"
-    compile files("${rootDir.path}/libs/jvox.jar")
+    implementation "net.onedaybeard.artemis:artemis-odb:2.3.0"
+    implementation "net.mostlyoriginal.artemis-odb:contrib-core:2.4.0"
+    implementation "net.mostlyoriginal.artemis-odb:contrib-eventbus:2.4.0"
+    implementation "net.mostlyoriginal.artemis-odb:contrib-network:2.4.0"
     /**Misc**/
-    compile group: 'commons-io', name: 'commons-io', version: '2.7'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.7'
+    implementation files("${rootDir.path}/libs/jvox.jar")
+    implementation project(":assets")
 
     /**Opengl related**/
     implementation platform("org.lwjgl:lwjgl-bom:3.2.3")

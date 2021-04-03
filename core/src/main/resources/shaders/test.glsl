@@ -2,10 +2,11 @@
 #version 400 core
 
 in vec3 position;
-in vec3 _normal;G
+in vec3 _normal;
 in vec2 _uv;
 
 uniform mat4 viewMatrix;
+
 uniform mat4 projectionMatrix;
 uniform mat4 modelMatrix;
 out vec3 normal;
